@@ -23,6 +23,9 @@ import { generateArduinoCode } from "../generators/codeGenerator.js";
 import { COMPONENTS, getByCategory } from "../core/components.js";
 import { validateGenerateRequest } from "../validators/requestValidator.js";
 
+// -- Import new routers --
+import exportRouter from "./export.js";
+
 // ── Path helpers (ESM doesn't have __dirname) ──────────────────
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -46,6 +49,9 @@ app.use(helmet({
 app.use(cors({ origin: config.allowedOrigin }));
 app.use(express.json({ limit: "16kb" }));
 app.use(express.static(PUBLIC_DIR));
+
+// Mount routes
+app.use("/api/export", exportRouter);
 
 // ── Rate limiter — configurable via config ─────────────────────
 const rateLimiter = new RateLimiterMemory({

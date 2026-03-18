@@ -63,6 +63,7 @@ const els = {
 
     copyCodeBtn: $("copyCodeBtn"),
     copyWiringBtn: $("copyWiringBtn"),
+    downloadZipBtn: $("downloadZipBtn"),
     retryBtn: $("retryBtn"),
 };
 
@@ -201,6 +202,7 @@ async function handleGenerate() {
 
         const result = await API.generate(payload);
         stopLoadingCycle();
+        lastResult = result;
         setState(STATES.RESULT, result);
 
         // Auto-scroll to results on mobile
@@ -244,6 +246,65 @@ function escapeHtml(str) {
         .replace(/"/g, "&quot;");
 }
 
+// ── Download ZIP ───────────────────────────────────────────────
+async function handleDownloadZip() {
+    if (!lastResult || !lastResult.data.code) return;
+
+    const originalHtml = els.downloadZipBtn.innerHTML;
+    els.downloadZipBtn.innerHTML = "Zipping...";
+    els.downloadZipBtn.disabled = true;
+
+    try {
+        const payload = {
+            prompt: els.prompt.value.trim(),
+            code: lastResult.data.code,
+            wiring: lastResult.data.wiring,
+            libraries: lastResult.data.libraries,
+            notes: lastResult.data.notes
+        };
+
+        const res = await fetch("/api/export", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) throw new Error("Export failed");
+
+        // Extract filename from headers if possible
+        let filename = "ArduinoForge_Project.zip";
+        const disposition = res.headers.get("Content-Disposition");
+        if (disposition && disposition.includes("filename=")) {
+            filename = disposition.split("filename=")[1].replace(/"/g, "");
+        }
+
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+
+        // Create an invisible anchor to trigger browser download
+        const a = document.createElement("a");
+        a.style.display = "none";
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+
+        // Cleanup
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+
+    } catch (err) {
+        console.error("Download error:", err);
+        alert("Failed to download ZIP: " + err.message);
+    } finally {
+        els.downloadZipBtn.innerHTML = "Downloaded!";
+        setTimeout(() => {
+            els.downloadZipBtn.innerHTML = originalHtml;
+            els.downloadZipBtn.disabled = false;
+        }, 2000);
+    }
+}
+
 // ── Event listeners ────────────────────────────────────────────
 function init() {
     // Generate button
@@ -262,9 +323,10 @@ function init() {
         tab.addEventListener("click", () => switchTab(tab.dataset.tab));
     });
 
-    // Copy buttons
+    // Action buttons
     els.copyCodeBtn?.addEventListener("click", () => copyText("codeOutput", els.copyCodeBtn));
     els.copyWiringBtn?.addEventListener("click", () => copyText("wiringOutput", els.copyWiringBtn));
+    els.downloadZipBtn?.addEventListener("click", handleDownloadZip);
 
     // Retry button
     els.retryBtn?.addEventListener("click", () => {
