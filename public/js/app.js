@@ -1,8 +1,7 @@
 /**
  * Arduino Forge — Frontend Application
  *
- * Pure vanilla JS. No framework. No build step.
- * Modules: UI state machine, API client, renderer.
+ * Professional GitHub-inspired UI logic.
  */
 
 // ── API Client ─────────────────────────────────────────────────
@@ -27,15 +26,13 @@ const API = {
 // ── State machine ──────────────────────────────────────────────
 const STATES = { IDLE: "idle", LOADING: "loading", RESULT: "result", ERROR: "error" };
 let currentState = STATES.IDLE;
-let lastResult = null;
 
 const LOADING_MESSAGES = [
-    "Analyzing your request...",
+    "Analyzing architecture...",
     "Matching component specs...",
-    "Building pin diagrams...",
-    "Generating C++ code...",
-    "Verifying wiring...",
-    "Formatting output...",
+    "Building schematic...",
+    "Synthesizing C++ code...",
+    "Resolving dependencies...",
 ];
 
 // ── DOM references ─────────────────────────────────────────────
@@ -67,7 +64,6 @@ const els = {
     copyCodeBtn: $("copyCodeBtn"),
     copyWiringBtn: $("copyWiringBtn"),
     retryBtn: $("retryBtn"),
-    componentsGrid: $("componentsGrid"),
 };
 
 // ── UI State transitions ───────────────────────────────────────
@@ -84,27 +80,27 @@ function setState(state, data = null) {
         case STATES.IDLE:
             els.emptyState.hidden = false;
             els.generateBtn.disabled = false;
-            els.generateBtn.querySelector(".btn-generate__text").textContent = "Generate Code";
+            els.generateBtn.textContent = "Generate Code";
             break;
 
         case STATES.LOADING:
             els.loadingState.hidden = false;
             els.generateBtn.disabled = true;
-            els.generateBtn.querySelector(".btn-generate__text").textContent = "Generating...";
+            els.generateBtn.textContent = "Processing...";
             startLoadingCycle();
             break;
 
         case STATES.RESULT:
             els.resultState.hidden = false;
             els.generateBtn.disabled = false;
-            els.generateBtn.querySelector(".btn-generate__text").textContent = "Generate Code";
+            els.generateBtn.textContent = "Generate Code";
             if (data) renderResult(data);
             break;
 
         case STATES.ERROR:
             els.errorState.hidden = false;
             els.generateBtn.disabled = false;
-            els.generateBtn.querySelector(".btn-generate__text").textContent = "Generate Code";
+            els.generateBtn.textContent = "Generate Code";
             if (data) els.errorMessage.textContent = data;
             break;
     }
@@ -117,7 +113,7 @@ function startLoadingCycle() {
     loadingTimer = setInterval(() => {
         i = (i + 1) % LOADING_MESSAGES.length;
         els.loadingText.textContent = LOADING_MESSAGES[i];
-    }, 2200);
+    }, 2000);
 }
 
 function stopLoadingCycle() {
@@ -127,15 +123,15 @@ function stopLoadingCycle() {
 // ── Result renderer ────────────────────────────────────────────
 function renderResult(response) {
     const { data, meta } = response;
-    lastResult = response;
 
     // Meta bar
     const metaTags = [
-        meta.board ? `<span class="meta-tag meta-tag--board">${meta.board}</span>` : "",
-        meta.difficulty ? `<span class="meta-tag">${meta.difficulty}</span>` : "",
-        meta.generationTimeMs ? `<span class="meta-tag meta-tag--time">${(meta.generationTimeMs / 1000).toFixed(1)}s</span>` : "",
-        (meta.warnings?.length > 0) ? `<span class="meta-tag meta-tag--warning">⚠ ${meta.warnings.length} warning${meta.warnings.length > 1 ? "s" : ""}</span>` : "",
-    ].filter(Boolean).join("");
+        meta.board ? `<span>${escapeHtml(meta.board)}</span>` : "",
+        meta.difficulty ? `<span>Level: ${escapeHtml(meta.difficulty)}</span>` : "",
+        meta.generationTimeMs ? `<span class="muted">${(meta.generationTimeMs / 1000).toFixed(1)}s</span>` : "",
+        (meta.warnings?.length > 0) ? `<span class="text-red">⚠ ${meta.warnings.length} warning(s)</span>` : "",
+    ].filter(Boolean).join(`<span class="muted">|</span>`);
+
     els.resultMeta.innerHTML = metaTags;
 
     // Code pane
@@ -147,26 +143,24 @@ function renderResult(response) {
 
     // Libraries pane
     if (data.libraries?.length > 0) {
-        els.librariesOutput.innerHTML = data.libraries.map((lib, i) => `
-      <div class="library-item">
-        <span class="library-number">${String(i + 1).padStart(2, "0")}</span>
-        <div>
-          <div class="library-name">${escapeHtml(lib)}</div>
-          <div class="library-hint">Install via Arduino IDE → Tools → Manage Libraries → search "${escapeHtml(lib)}"</div>
-        </div>
-      </div>
-    `).join("");
+        els.librariesOutput.innerHTML = `<ul style="list-style-position: inside;">` +
+            data.libraries.map((lib) => `
+        <li style="margin-bottom: 8px;">
+          <strong>${escapeHtml(lib)}</strong>
+          <div class="muted" style="margin-left: 18px; font-size: 12px;">Install via Library Manager</div>
+        </li>
+      `).join("") + `</ul>`;
     } else {
-        els.librariesOutput.innerHTML = `<div class="no-libraries">No external libraries required — uses built-in Arduino functions only.</div>`;
+        els.librariesOutput.innerHTML = `<div class="muted">No external libraries required. Uses built-in standard libraries.</div>`;
     }
 
     // Notes pane
-    els.notesOutput.textContent = data.notes || "No additional notes.";
+    els.notesOutput.textContent = data.notes || "No additional documentation.";
 
     // Summary bar
-    els.summaryBar.textContent = data.summary || "";
+    els.summaryBar.textContent = data.summary || "System synthesized successfully.";
 
-    // Show warnings inline
+    // Show warnings inline on the left panel
     if (meta.warnings?.length > 0) {
         els.warningsList.innerHTML = meta.warnings.map(w => `<li>${escapeHtml(w)}</li>`).join("");
         els.warningsBox.hidden = false;
@@ -179,10 +173,10 @@ function renderResult(response) {
 // ── Tab switching ──────────────────────────────────────────────
 function switchTab(name) {
     document.querySelectorAll(".tab").forEach(t => {
-        t.classList.toggle("tab--active", t.dataset.tab === name);
+        t.classList.toggle("active", t.dataset.tab === name);
     });
     document.querySelectorAll(".tab-pane").forEach(p => {
-        p.classList.toggle("tab-pane--active", p.id === `pane-${name}`);
+        p.classList.toggle("active", p.id === `pane-${name}`);
     });
 }
 
@@ -209,6 +203,11 @@ async function handleGenerate() {
         stopLoadingCycle();
         setState(STATES.RESULT, result);
 
+        // Auto-scroll to results on mobile
+        if (window.innerWidth <= 900) {
+            els.resultMeta.scrollIntoView({ behavior: 'smooth' });
+        }
+
     } catch (err) {
         stopLoadingCycle();
         setState(STATES.ERROR, err.message);
@@ -223,65 +222,17 @@ function copyText(targetId, btn) {
     navigator.clipboard.writeText(el.textContent).then(() => {
         const original = btn.textContent;
         btn.textContent = "Copied!";
-        btn.classList.add("copied");
         setTimeout(() => {
             btn.textContent = original;
-            btn.classList.remove("copied");
         }, 2000);
     });
-}
-
-// ── Components grid ────────────────────────────────────────────
-async function loadComponents() {
-    try {
-        const { data } = await API.components();
-        if (!data || !els.componentsGrid) return;
-
-        const categoryLabel = {
-            microcontrollers: "MCU",
-            sensors: "Sensor",
-            displays: "Display",
-            actuators: "Actuator",
-            communication: "Comms",
-        };
-
-        const allItems = Object.entries(data).flatMap(([cat, items]) =>
-            items.map(item => ({ ...item, catLabel: categoryLabel[cat] ?? cat }))
-        );
-
-        els.componentsGrid.innerHTML = allItems.map(item => `
-      <div class="component-card" data-name="${escapeHtml(item.name)}" tabindex="0" role="button">
-        <div class="component-card__category">${escapeHtml(item.catLabel)}</div>
-        <div class="component-card__name">${escapeHtml(item.name)}</div>
-        <div class="component-card__voltage">${escapeHtml(String(item.voltage ?? ""))}</div>
-      </div>
-    `).join("");
-
-        // Click a component card → insert name into prompt
-        els.componentsGrid.addEventListener("click", e => {
-            const card = e.target.closest(".component-card");
-            if (!card) return;
-            const name = card.dataset.name;
-            const current = els.prompt.value;
-            if (current && !current.includes(name)) {
-                els.prompt.value = current.trimEnd() + (current.endsWith(",") ? " " : ", ") + name;
-            } else if (!current) {
-                els.prompt.value = `Use ${name} with Arduino Uno`;
-            }
-            els.prompt.focus();
-            updateCharCount();
-        });
-
-    } catch (err) {
-        console.warn("Could not load components:", err.message);
-    }
 }
 
 // ── Char counter ───────────────────────────────────────────────
 function updateCharCount() {
     const len = els.prompt.value.length;
     els.charCount.textContent = `${len} / 2000`;
-    els.charCount.style.color = len > 1800 ? "var(--yellow)" : "";
+    els.charCount.style.color = len > 1800 ? "var(--accent-red)" : "";
 }
 
 // ── Utilities ──────────────────────────────────────────────────
@@ -322,18 +273,13 @@ function init() {
     });
 
     // Example chips
-    document.querySelectorAll(".example-chip").forEach(chip => {
+    document.querySelectorAll(".chip").forEach(chip => {
         chip.addEventListener("click", () => {
             els.prompt.value = chip.dataset.prompt;
             updateCharCount();
             els.prompt.focus();
-            // Auto-scroll to generator on mobile
-            els.prompt.scrollIntoView({ behavior: "smooth", block: "center" });
         });
     });
-
-    // Load components grid
-    loadComponents();
 
     // Initial state
     setState(STATES.IDLE);
