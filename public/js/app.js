@@ -107,10 +107,10 @@ const els = {
     notesOutput: $("notesOutput"),
     summaryBar: $("summaryBar"),
 
-    copyCodeBtn: $("copyCodeBtn"),
     copyWiringBtn: $("copyWiringBtn"),
     downloadZipBtn: $("downloadZipBtn"),
     saveProjectBtn: $("saveProjectBtn"),
+    compileActionBtn: $("compileActionBtn"),
     retryBtn: $("retryBtn"),
 
     // Auth & Modals
@@ -379,6 +379,64 @@ async function handleDownloadZip() {
     }
 }
 
+// ── Compile Flow ───────────────────────────────────────────────
+async function handleCompile() {
+    if (!lastResult || !lastResult.data.code) return;
+
+    const originalHtml = els.compileActionBtn.innerHTML;
+    els.compileActionBtn.innerHTML = "Compiling...";
+    els.compileActionBtn.disabled = true;
+
+    try {
+        const payload = {
+            code: lastResult.data.code,
+            board: lastResult.meta?.board || "arduino-uno"
+        };
+
+        const res = await fetch("/api/compile", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+            const errData = await res.json();
+            throw new Error(errData.error || "Compilation failed");
+        }
+
+        // Handle binary blob
+        let filename = "firmware.hex";
+        const disposition = res.headers.get("Content-Disposition");
+        if (disposition && disposition.includes("filename=")) {
+            filename = disposition.split("filename=")[1].replace(/"/g, "");
+        }
+
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+
+        // Trigger download
+        const a = document.createElement("a");
+        a.style.display = "none";
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+
+    } catch (err) {
+        console.error("Compile error:", err);
+        alert("Compilation failed:\n" + err.message);
+    } finally {
+        els.compileActionBtn.innerHTML = "Compiled!";
+        setTimeout(() => {
+            els.compileActionBtn.innerHTML = originalHtml;
+            els.compileActionBtn.disabled = false;
+        }, 2000);
+    }
+}
+
 // ── Auth & Cloud Savings ───────────────────────────────────────
 function updateAuthUI() {
     if (currentUser) {
@@ -538,6 +596,7 @@ function init() {
     els.copyWiringBtn?.addEventListener("click", () => copyText("wiringOutput", els.copyWiringBtn));
     els.downloadZipBtn?.addEventListener("click", handleDownloadZip);
     els.saveProjectBtn?.addEventListener("click", handleSaveProject);
+    els.compileActionBtn?.addEventListener("click", handleCompile);
 
     // Retry button
     els.retryBtn?.addEventListener("click", () => {
