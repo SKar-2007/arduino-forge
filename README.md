@@ -1,144 +1,112 @@
-# ⚡ Arduino Forge
+<div align="center">
+  <img src="public/favicon.ico" alt="Arduino Forge Logo" width="100"/>
+  <h1>Arduino <strong>Forge</strong></h1>
+  <p><strong>The Ultimate AI-Powered IDE & Circuit Generator for Makers</strong></p>
+  
+  [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+  [![Node.js](https://img.shields.io/badge/Node.js-18.x-green.svg)](https://nodejs.org)
+  [![Express.js](https://img.shields.io/badge/Express.js-Backend-lightgrey.svg)](https://expressjs.com/)
+  [![SQLite](https://img.shields.io/badge/Database-SQLite3-blue.svg)](https://sqlite.org/)
+</div>
 
-**AI-powered Arduino & ESP32 code generator.** Describe your project in plain English — get working C++ code with accurate wiring diagrams, library lists, and component pinouts. Free, always.
+<br />
+
+Arduino Forge is a next-generation, browser-based development environment that utilizes Large Language Models (LLMs) to automatically generate ready-to-flash C++ code, circuit wiring diagrams, and library dependencies based on natural language prompts.
+
+> *“Blink an LED when the temperature exceeds 30°C”* -> Instant Code, Wiring, and Firmware.
 
 ---
 
-## What it does
+## ✨ Features
 
-- Generates complete, commented Arduino/ESP32 C++ from a natural language description
-- Produces ASCII wiring diagrams with exact pin numbers
-- Lists every required library with installation instructions
-- Detects voltage mismatches and flags safety warnings before you fry your board
-- Supports 20+ components out of the box (sensors, displays, actuators, comms)
+- 🧠 **AI Code Generation**: Powered by the Gemini 2.0 Flash API to write accurate Arduino C++ code instantly.
+- 🎨 **Premium Developer UI**: A beautiful, GitHub-inspired dark mode interface with glassmorphism interactions and syntax highlighting.
+- ☁️ **Cloud Compilation**: Built-in headless `arduino-cli` compiler. Click a button to instantly download `.hex` and `.bin` binaries without opening the Arduino IDE.
+- 📦 **Export as .ZIP**: Instantly bundles your generated `.ino` file and a formatted `README.md` with wiring instructions into a zipped sketch folder.
+- 🔐 **User Accounts & Cloud Saves**: Built-in SQLite database with JWT authentication. Save your generated circuits and code to your account to load them anywhere.
+- 📊 **Admin Metrics Board**: Track API usage, user growth, and generation activity natively via the admin dashboard.
+- 🔌 **Vast Component Library**: Deep AI context for over 20+ sensors and actuators, including ESP32s, RTCs, MPU6050s, Steppers, and RFID Readers.
 
-## Quick start
+---
 
-```bash
-# 1. Clone
-git clone https://github.com/yourusername/arduino-forge
-cd arduino-forge
+## 🚀 Getting Started
 
-# 2. Install dependencies
-npm install
+### Prerequisites
 
-# 3. Set up environment
-cp .env.example .env
-# Edit .env and add your GEMINI_API_KEY
+- [Node.js](https://nodejs.org/) (v16+)
+- An API Key from Google Gemini (`GEMINI_API_KEY`)
+- *(Optional)* [arduino-cli](https://arduino.github.io/arduino-cli/) installed in `./bin` for the Cloud Compiler feature.
 
-# 4. Run
-npm start
+### Installation
 
-# Open http://localhost:3000
-```
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/SKar-2007/arduino-forge.git
+   cd arduino-forge
+   ```
 
-## Supported boards
+2. **Install Dependencies**
+   ```bash
+   npm install
+   ```
 
-| Board | Voltage | WiFi | Notes |
-|-------|---------|------|-------|
-| Arduino Uno | 5V | ✗ | ATmega328P, 32KB flash |
-| Arduino Nano | 5V | ✗ | Compact, same pins as Uno |
-| ESP32 | 3.3V | ✓ | 240MHz, 520KB RAM, BT |
-| ESP8266 | 3.3V | ✓ | Simple WiFi projects |
+3. **Configure Environment**
+   Create a `.env` file in the root directory:
+   ```env
+   PORT=3000
+   NODE_ENV=development
+   GEMINI_API_KEY=your_google_gemini_api_key_here
+   JWT_SECRET=super_secret_jwt_key_for_authentication
+   ```
 
-## Supported components
+4. **Start the Development Server**
+   ```bash
+   npm run dev
+   ```
+   *The server will start at `http://localhost:3000` and the SQLite database (`forge.db`) will auto-initialize.*
 
-**Sensors:** DHT11, DHT22, HC-SR04 Ultrasonic, PIR Motion, LDR, MQ-2 Gas, Soil Moisture, BMP280, MPU-6050
+---
 
-**Displays:** OLED 128×64 (SSD1306), LCD 16×2
+## 🛠️ Technology Stack
 
-**Actuators:** Servo Motor, DC Motor + L298N, Relay Module
+- **Frontend:** Vanilla JavaScript (ES6+), semantic HTML5, custom CSS variables & Flexbox/Grid layouts.
+- **Backend:** Node.js, Express.js (Modular ESM Routers).
+- **Database:** `better-sqlite3` (Zero-config local database for Users and Projects).
+- **Security:** `helmet`, `cors`, `bcrypt` for password hashing, `jsonwebtoken` for auth sessions, built-in memory rate limiters.
+- **Tooling:** `jszip` for folder archiving, `arduino-cli` for host-side C++ compilation.
 
-**Communication:** HC-05 Bluetooth, nRF24L01 Wireless
+---
 
-## API
+## 🗂️ Project Structure
 
-```
-POST /api/generate
-Body: { "prompt": "string", "board"?: "arduino-uno|esp32|...", "difficulty"?: "beginner|intermediate|advanced" }
-
-GET  /api/components   — list all supported components
-GET  /api/health       — service status
-```
-
-Rate limit: 20 requests/hour per IP.
-
-## Project structure
-
-```
+```text
 arduino-forge/
+├── config/             # Database and environment configurations
+├── public/             # Static Assets (HTML, CSS, Vanilla JS)
 ├── src/
-│   ├── api/
-│   │   └── server.js              Express server, routes, rate limiter
-│   ├── core/
-│   │   ├── components.js          Component database (pinouts, libraries, notes)
-│   │   └── promptBuilder.js       Builds AI prompts from parsed requests
-│   ├── generators/
-│   │   └── codeGenerator.js       Calls Gemini API, parses response
-│   ├── parsers/
-│   │   └── requestParser.js       Detects board/components from natural language
-│   └── validators/
-│       └── requestValidator.js    Input validation
-├── public/
-│   ├── index.html                 Frontend SPA
-│   ├── css/main.css               Styles (IBM Plex, industrial dark theme)
-│   └── js/app.js                  Frontend JS (vanilla, no framework)
-├── docs/                          Extended documentation
-├── examples/                      Example prompts and outputs
-├── tests/                         Unit tests
-├── config/                        Config files
-├── .env.example                   Environment variable template
-└── package.json
+│   ├── api/            # Express Routers (Auth, Compiler, Projects, Export, Metrics)
+│   ├── core/           # Business Logic (Hardware constraints, AI prompts)
+│   ├── generators/     # LLM integration (Gemini API calls)
+│   ├── parsers/        # Markdown/JSON parsing logic from AI responses
+│   └── validators/     # Backend request validation middlewares
+├── bin/                # (Optional) arduino-cli installation for compilers
+├── temp/               # Ephemeral storage for .hex firmware building
+└── server.js           # Entry point
 ```
 
-## Adding new components
+---
 
-Open `src/core/components.js` and add an entry:
+## 👨‍💻 Contributing
 
-```js
-"your-sensor": {
-  name:        "Your Sensor Full Name",
-  category:    "sensor",       // sensor | actuator | display | communication
-  voltage:     "3.3V-5V",
-  protocol:    "I2C",
-  library:     "Sensor Library Name",
-  libraryInstall: "Library Name in Arduino Library Manager",
-  pins: {
-    vcc:  "3.3V or 5V",
-    gnd:  "GND",
-    sda:  "I2C SDA pin",
-    scl:  "I2C SCL pin",
-  },
-  i2cAddress: "0x42",
-  notes:      "Any important caveats",
-  codeHint:   "sensor.read();",
-},
-```
+Contributions, issues, and feature requests are welcome!
+Feel free to check out the [issues page](https://github.com/SKar-2007/arduino-forge/issues).
 
-The AI generator automatically picks up the new component — no other changes needed.
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-## Philosophy
+## 📝 License
 
-- **Free model:** 20 generations/hour per IP. No accounts. No paywalls. No tracking.
-- **No hallucinations:** Component pinouts are database-driven, not AI-generated.
-- **Education first:** Code is written for B.Tech/hobbyist level — verbose comments, clear structure.
-- **Open source:** Fork it, extend it, deploy your own instance.
-
-## Deploy (free options)
-
-**Railway:**
-```bash
-railway login && railway deploy
-```
-
-**Render:**
-Connect GitHub repo → set GEMINI_API_KEY env var → deploy.
-
-**Self-hosted:**
-```bash
-PORT=3000 GEMINI_API_KEY=your_key node src/api/server.js
-```
-
-## License
-
-MIT — use it, fork it, deploy it, teach with it.
+Distributed under the MIT License. See `LICENSE` for more information.

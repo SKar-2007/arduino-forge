@@ -107,6 +107,7 @@ const els = {
     notesOutput: $("notesOutput"),
     summaryBar: $("summaryBar"),
 
+    copyCodeBtn: $("copyCodeBtn"),
     copyWiringBtn: $("copyWiringBtn"),
     downloadZipBtn: $("downloadZipBtn"),
     saveProjectBtn: $("saveProjectBtn"),

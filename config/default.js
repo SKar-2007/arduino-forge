@@ -18,12 +18,12 @@ export const config = Object.freeze({
   /** Gemini AI */
   gemini: Object.freeze({
     apiKey: process.env.GEMINI_API_KEY || "",
-    model:  process.env.GEMINI_MODEL   || "gemini-2.5-flash",
+    model: process.env.GEMINI_MODEL || "gemini-1.5-flash",
   }),
 
   /** Rate limiting */
   rateLimit: Object.freeze({
-    points:   parseInt(process.env.RATE_LIMIT_POINTS, 10) || 20,
+    points: parseInt(process.env.RATE_LIMIT_POINTS, 10) || 20,
     duration: parseInt(process.env.RATE_LIMIT_DURATION, 10) || 3600, // seconds
   }),
 
@@ -32,5 +32,5 @@ export const config = Object.freeze({
 
   /** Environment */
   nodeEnv: process.env.NODE_ENV || "development",
-  isDev:   (process.env.NODE_ENV || "development") === "development",
+  isDev: (process.env.NODE_ENV || "development") === "development",
 });

@@ -647,9 +647,14 @@ code {
     background: rgba(1, 4, 9, 0.8);
     backdrop-filter: blur(4px);
     z-index: 1000;
-    display: flex;
+    display: none;
+    /* Changed from flex to none */
     align-items: center;
     justify-content: center;
+}
+
+.modal-backdrop:not([hidden]) {
+    display: flex;
 }
 
 .modal {
