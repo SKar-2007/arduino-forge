@@ -5,11 +5,21 @@
  */
 
 // ── API Client ─────────────────────────────────────────────────
+
+// Helper to inject Auth token
+function getAuthHeaders() {
+    const token = localStorage.getItem("forge_token");
+    return {
+        "Content-Type": "application/json",
+        ...(token && { "Authorization": `Bearer ${token}` })
+    };
+}
+
 const API = {
     async generate(payload) {
         const res = await fetch("/api/generate", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: getAuthHeaders(),
             body: JSON.stringify(payload),
         });
         const data = await res.json();
@@ -21,6 +31,42 @@ const API = {
         const res = await fetch("/api/components");
         return res.json();
     },
+
+    async auth(endpoint, username, password) {
+        const res = await fetch(`/api/auth/${endpoint}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Auth failed");
+        return data;
+    },
+
+    async getProjects() {
+        const res = await fetch("/api/projects", { headers: getAuthHeaders() });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        return data.data;
+    },
+
+    async saveProject(payload) {
+        const res = await fetch("/api/projects", {
+            method: "POST",
+            headers: getAuthHeaders(),
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        return data;
+    },
+
+    async getProjectDetails(id) {
+        const res = await fetch(`/api/projects/${id}`, { headers: getAuthHeaders() });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        return data.data;
+    }
 };
 
 // ── State machine ──────────────────────────────────────────────
@@ -64,8 +110,33 @@ const els = {
     copyCodeBtn: $("copyCodeBtn"),
     copyWiringBtn: $("copyWiringBtn"),
     downloadZipBtn: $("downloadZipBtn"),
+    saveProjectBtn: $("saveProjectBtn"),
     retryBtn: $("retryBtn"),
+
+    // Auth & Modals
+    authNavGuest: $("authNavGuest"),
+    authNavUser: $("authNavUser"),
+    btnOpenLogin: $("btnOpenLogin"),
+    btnOpenRegister: $("btnOpenRegister"),
+    btnLogout: $("btnLogout"),
+    btnMyProjects: $("btnMyProjects"),
+    projectsCount: $("projectsCount"),
+
+    authModal: $("authModal"),
+    authModalTitle: $("authModalTitle"),
+    btnCloseAuthModal: $("btnCloseAuthModal"),
+    authUsername: $("authUsername"),
+    authPassword: $("authPassword"),
+    btnSubmitAuth: $("btnSubmitAuth"),
+    authError: $("authError"),
+
+    projectsModal: $("projectsModal"),
+    btnCloseProjectsModal: $("btnCloseProjectsModal"),
+    projectsList: $("projectsList")
 };
+
+let currentUser = localStorage.getItem("forge_username") || null;
+let pendingAuthAction = "login"; // "login" or "register"
 
 // ── UI State transitions ───────────────────────────────────────
 function setState(state, data = null) {
@@ -166,6 +237,9 @@ function renderResult(response) {
         els.warningsList.innerHTML = meta.warnings.map(w => `<li>${escapeHtml(w)}</li>`).join("");
         els.warningsBox.hidden = false;
     }
+
+    // Toggle save button
+    els.saveProjectBtn.style.display = currentUser ? "inline-flex" : "none";
 
     // Reset to code tab
     switchTab("code");
@@ -305,8 +379,144 @@ async function handleDownloadZip() {
     }
 }
 
+// ── Auth & Cloud Savings ───────────────────────────────────────
+function updateAuthUI() {
+    if (currentUser) {
+        els.authNavGuest.hidden = true;
+        els.authNavUser.hidden = false;
+        refreshProjectsCount();
+        // Show save button if we have a result
+        if (window.lastResult) els.saveProjectBtn.style.display = "inline-flex";
+    } else {
+        els.authNavGuest.hidden = false;
+        els.authNavUser.hidden = true;
+        els.saveProjectBtn.style.display = "none";
+    }
+}
+
+function stopAuthLoading(originalHtml) {
+    els.btnSubmitAuth.innerHTML = originalHtml;
+    els.btnSubmitAuth.disabled = false;
+}
+
+async function handleAuthSubmit() {
+    const username = els.authUsername.value.trim();
+    const password = els.authPassword.value.trim();
+    if (!username || !password) return;
+
+    const originalHtml = els.btnSubmitAuth.innerHTML;
+    els.btnSubmitAuth.innerHTML = "Processing...";
+    els.btnSubmitAuth.disabled = true;
+    els.authError.hidden = true;
+
+    try {
+        const data = await API.auth(pendingAuthAction, username, password);
+        localStorage.setItem("forge_token", data.token);
+        localStorage.setItem("forge_username", data.username);
+        currentUser = data.username;
+
+        updateAuthUI();
+        els.authModal.hidden = true;
+    } catch (err) {
+        els.authError.textContent = err.message;
+        els.authError.hidden = false;
+    } finally {
+        stopAuthLoading(originalHtml);
+    }
+}
+
+function handleLogout() {
+    localStorage.removeItem("forge_token");
+    localStorage.removeItem("forge_username");
+    currentUser = null;
+    updateAuthUI();
+}
+
+async function handleSaveProject() {
+    if (!lastResult || !currentUser) return;
+    const originalHtml = els.saveProjectBtn.innerHTML;
+    els.saveProjectBtn.innerHTML = "Saving...";
+    els.saveProjectBtn.disabled = true;
+
+    try {
+        await API.saveProject({
+            name: "Generated Circuit " + new Date().toLocaleTimeString(),
+            prompt: els.prompt.value.trim(),
+            code: lastResult.data.code,
+            wiring: lastResult.data.wiring,
+            libraries: lastResult.data.libraries,
+            notes: lastResult.data.notes
+        });
+
+        els.saveProjectBtn.innerHTML = "Saved!";
+        refreshProjectsCount();
+    } catch (err) {
+        alert("Failed to save: " + err.message);
+        els.saveProjectBtn.innerHTML = "Error";
+    }
+
+    setTimeout(() => {
+        els.saveProjectBtn.innerHTML = originalHtml;
+        els.saveProjectBtn.disabled = false;
+    }, 2000);
+}
+
+async function refreshProjectsCount() {
+    if (!currentUser) return;
+    try {
+        const projects = await API.getProjects();
+        els.projectsCount.textContent = projects.length;
+    } catch (e) { }
+}
+
+async function openProjectsModal() {
+    els.projectsModal.hidden = false;
+    els.projectsList.innerHTML = `<div class="muted">Loading projects...</div>`;
+
+    try {
+        const projects = await API.getProjects();
+        if (projects.length === 0) {
+            els.projectsList.innerHTML = `<div class="muted">You have no saved projects yet.</div>`;
+            return;
+        }
+
+        els.projectsList.innerHTML = projects.map(p => `
+      <div class="project-item" data-id="${p.id}">
+        <div>
+          <div class="project-name">${escapeHtml(p.name)}</div>
+          <div class="project-date">${new Date(p.created_at).toLocaleString()}</div>
+        </div>
+        <button class="btn btn-primary btn-sm btn-load" data-id="${p.id}">Load</button>
+      </div>
+    `).join("");
+
+        document.querySelectorAll(".btn-load").forEach(btn => {
+            btn.addEventListener("click", async (e) => {
+                e.stopPropagation();
+                const id = e.target.dataset.id;
+                els.projectsModal.hidden = true;
+                try {
+                    const det = await API.getProjectDetails(id);
+                    els.prompt.value = det.prompt || "";
+
+                    window.lastResult = {
+                        data: { code: det.code, wiring: det.wiring, libraries: det.libraries, notes: det.notes },
+                        meta: { board: det.board, warnings: [] } // simulate meta
+                    };
+                    renderResult(window.lastResult);
+                } catch (err) { alert("Failed to load project"); }
+            });
+        });
+
+    } catch (err) {
+        els.projectsList.innerHTML = `<div class="text-red">Failed to load projects.</div>`;
+    }
+}
+
 // ── Event listeners ────────────────────────────────────────────
 function init() {
+    updateAuthUI();
+
     // Generate button
     els.generateBtn.addEventListener("click", handleGenerate);
 
@@ -327,6 +537,7 @@ function init() {
     els.copyCodeBtn?.addEventListener("click", () => copyText("codeOutput", els.copyCodeBtn));
     els.copyWiringBtn?.addEventListener("click", () => copyText("wiringOutput", els.copyWiringBtn));
     els.downloadZipBtn?.addEventListener("click", handleDownloadZip);
+    els.saveProjectBtn?.addEventListener("click", handleSaveProject);
 
     // Retry button
     els.retryBtn?.addEventListener("click", () => {
@@ -342,6 +553,34 @@ function init() {
             els.prompt.focus();
         });
     });
+
+    // Auth Event Listeners
+    els.btnOpenLogin?.addEventListener("click", () => {
+        pendingAuthAction = "login";
+        els.authModalTitle.textContent = "Sign In";
+        els.btnSubmitAuth.textContent = "Sign In";
+        els.authError.hidden = true;
+        els.authModal.hidden = false;
+        els.authUsername.focus();
+    });
+
+    els.btnOpenRegister?.addEventListener("click", () => {
+        pendingAuthAction = "register";
+        els.authModalTitle.textContent = "Create Account";
+        els.btnSubmitAuth.textContent = "Sign Up";
+        els.authError.hidden = true;
+        els.authModal.hidden = false;
+        els.authUsername.focus();
+    });
+
+    els.btnCloseAuthModal?.addEventListener("click", () => els.authModal.hidden = true);
+    els.btnSubmitAuth?.addEventListener("click", handleAuthSubmit);
+
+    els.btnLogout?.addEventListener("click", handleLogout);
+
+    // Project Modals
+    els.btnMyProjects?.addEventListener("click", openProjectsModal);
+    els.btnCloseProjectsModal?.addEventListener("click", () => els.projectsModal.hidden = true);
 
     // Initial state
     setState(STATES.IDLE);

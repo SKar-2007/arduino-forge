@@ -27,3 +27,8 @@ Desktop.ini
 dist/
 tmp/
 .cache/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3

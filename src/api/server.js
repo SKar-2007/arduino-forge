@@ -25,6 +25,8 @@ import { validateGenerateRequest } from "../validators/requestValidator.js";
 
 // -- Import new routers --
 import exportRouter from "./export.js";
+import authRouter from "./auth.js";
+import projectsRouter from "./projects.js";
 
 // ── Path helpers (ESM doesn't have __dirname) ──────────────────
 const __filename = fileURLToPath(import.meta.url);
@@ -52,6 +54,8 @@ app.use(express.static(PUBLIC_DIR));
 
 // Mount routes
 app.use("/api/export", exportRouter);
+app.use("/api/auth", authRouter);
+app.use("/api/projects", projectsRouter);
 
 // ── Rate limiter — configurable via config ─────────────────────
 const rateLimiter = new RateLimiterMemory({
