@@ -28,6 +28,7 @@ import exportRouter from "./export.js";
 import authRouter from "./auth.js";
 import projectsRouter from "./projects.js";
 import compilerRouter from "./compiler.js";
+import metricsRouter, { metricsMiddleware } from "./metrics.js";
 
 // ── Path helpers (ESM doesn't have __dirname) ──────────────────
 const __filename = fileURLToPath(import.meta.url);
@@ -37,6 +38,7 @@ const PUBLIC_DIR = join(__dirname, "../../public");
 const app = express();
 
 // ── Middleware ─────────────────────────────────────────────────
+app.use(metricsMiddleware);
 app.use(compression());
 app.use(helmet({
     contentSecurityPolicy: {
@@ -58,6 +60,7 @@ app.use("/api/export", exportRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/projects", projectsRouter);
 app.use("/api/compile", compilerRouter);
+app.use("/api/metrics", metricsRouter);
 
 // ── Rate limiter — configurable via config ─────────────────────
 const rateLimiter = new RateLimiterMemory({

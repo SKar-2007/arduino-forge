@@ -132,7 +132,15 @@ const els = {
 
     projectsModal: $("projectsModal"),
     btnCloseProjectsModal: $("btnCloseProjectsModal"),
-    projectsList: $("projectsList")
+    projectsList: $("projectsList"),
+
+    btnAdminStats: $("btnAdminStats"),
+    adminModal: $("adminModal"),
+    btnCloseAdminModal: $("btnCloseAdminModal"),
+    statUsers: $("statUsers"),
+    statProjects: $("statProjects"),
+    statGenerations: $("statGenerations"),
+    adminActivityList: $("adminActivityList")
 };
 
 let currentUser = localStorage.getItem("forge_username") || null;
@@ -640,6 +648,31 @@ function init() {
     // Project Modals
     els.btnMyProjects?.addEventListener("click", openProjectsModal);
     els.btnCloseProjectsModal?.addEventListener("click", () => els.projectsModal.hidden = true);
+
+    // Admin Modals
+    els.btnAdminStats?.addEventListener("click", async () => {
+        els.adminModal.hidden = false;
+        try {
+            const res = await fetch("/api/metrics");
+            const data = await res.json();
+            if (data.success) {
+                els.statUsers.textContent = data.stats.totalUsers;
+                els.statProjects.textContent = data.stats.totalProjectsSaved;
+                els.statGenerations.textContent = data.stats.totalCodeGenerations;
+
+                els.adminActivityList.innerHTML = data.recentActivity.map(a => `
+            <tr>
+              <td style="padding:8px; border-bottom:1px solid var(--border-default);">${escapeHtml(a.endpoint)}</td>
+              <td style="padding:8px; border-bottom:1px solid var(--border-default);"><span class="${a.status_code >= 400 ? 'text-red' : ''}">${a.status_code}</span></td>
+              <td style="padding:8px; border-bottom:1px solid var(--border-default);">${a.duration_ms}ms</td>
+            </tr>
+          `).join("");
+            }
+        } catch (err) {
+            els.adminActivityList.innerHTML = `<tr><td colspan="3" class="text-red">Failed to load metrics.</td></tr>`;
+        }
+    });
+    els.btnCloseAdminModal?.addEventListener("click", () => els.adminModal.hidden = true);
 
     // Initial state
     setState(STATES.IDLE);
