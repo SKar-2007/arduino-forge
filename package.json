@@ -1,0 +1,39 @@
+{
+  "name": "arduino-forge",
+  "version": "1.0.0",
+  "description": "AI-powered Arduino/ESP32 code generator — describe what you want, get working embedded C++ with wiring diagrams",
+  "type": "module",
+  "main": "src/api/server.js",
+  "scripts": {
+    "start":   "node src/api/server.js",
+    "dev":     "node --watch src/api/server.js",
+    "test":    "node --test tests/",
+    "lint":    "eslint src/ --ext .js",
+    "build":   "echo 'No build step — pure Node.js server'"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "express":       "^4.18.2",
+    "cors":          "^2.8.5",
+    "dotenv":        "^16.3.1",
+    "marked":        "^9.1.0",
+    "highlight.js":  "^11.9.0",
+    "rate-limiter-flexible": "^4.0.1",
+    "helmet":        "^7.1.0",
+    "compression":   "^1.7.4"
+  },
+  "devDependencies": {
+    "eslint": "^8.54.0"
+  },
+  "keywords": [
+    "arduino", "esp32", "embedded", "code-generator",
+    "ai", "microcontroller", "iot", "education"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/arduino-forge"
+  }
+}

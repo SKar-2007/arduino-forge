@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Arduino Forge — AI Code Generator</title>
+    <meta name="description"
+        content="Generate production-ready Arduino & ESP32 C++ code with accurate wiring diagrams, library lists, and safety checks — free, instantly, no login required." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/base16/tomorrow-night.min.css" />
+    <link rel="stylesheet" href="/css/main.css" />
+</head>
+
+<body>
+
+    <!-- ── Header ─────────────────────────────────────────────── -->
+    <header class="site-header">
+        <div class="header-inner">
+            <div class="logo">
+                <span class="logo-icon">⚡</span>
+                <span class="logo-text">Arduino<strong>Forge</strong></span>
+                <span class="logo-badge">v1.0</span>
+            </div>
+            <nav class="header-nav">
+                <a href="#examples" class="nav-link">Examples</a>
+                <a href="#components" class="nav-link">Components</a>
+                <a href="https://github.com/yourusername/arduino-forge" class="nav-link nav-link--github"
+                    target="_blank">
+                    GitHub
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ── Hero ───────────────────────────────────────────────── -->
+    <section class="hero">
+        <div class="hero-grid-bg" aria-hidden="true"></div>
+        <div class="container">
+            <div class="hero-eyebrow">AI-Powered Embedded Code Generation</div>
+            <h1 class="hero-title">
+                Describe your circuit.<br />
+                <span class="hero-title--accent">Get working code.</span>
+            </h1>
+            <p class="hero-subtitle">
+                Generate production-ready Arduino & ESP32 C++ with accurate pin diagrams,
+                library lists, and wiring tables — instantly. Free, always.
+            </p>
+            <div class="hero-chips">
+                <span class="chip">Arduino Uno</span>
+                <span class="chip">ESP32</span>
+                <span class="chip">ESP8266</span>
+                <span class="chip">Arduino Nano</span>
+                <span class="chip chip--more">+20 components</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── Main Generator ─────────────────────────────────────── -->
+    <main class="main-content">
+        <div class="container">
+            <div class="generator-layout">
+
+                <!-- Left: Input panel -->
+                <aside class="panel panel--input">
+                    <div class="panel-header">
+                        <span class="panel-label">01</span>
+                        <h2 class="panel-title">Describe Your Project</h2>
+                    </div>
+
+                    <div class="field-group">
+                        <label class="field-label" for="prompt">What do you want to build?</label>
+                        <textarea id="prompt" class="field-textarea" rows="5" maxlength="2000"
+                            placeholder="e.g. Read temperature and humidity with a DHT22 sensor on ESP32, display it on an OLED screen, and send an alert if temperature exceeds 35°C"
+                            autocomplete="off" spellcheck="false"></textarea>
+                        <div class="field-meta">
+                            <span class="char-count" id="charCount">0 / 2000</span>
+                        </div>
+                    </div>
+
+                    <div class="controls-row">
+                        <div class="field-group field-group--half">
+                            <label class="field-label" for="boardSelect">Board</label>
+                            <select id="boardSelect" class="field-select">
+                                <option value="">Auto-detect</option>
+                                <option value="arduino-uno">Arduino Uno</option>
+                                <option value="arduino-nano">Arduino Nano</option>
+                                <option value="esp32">ESP32</option>
+                                <option value="esp8266">ESP8266 / NodeMCU</option>
+                            </select>
+                        </div>
+                        <div class="field-group field-group--half">
+                            <label class="field-label" for="difficultySelect">Code Level</label>
+                            <select id="difficultySelect" class="field-select">
+                                <option value="beginner">Beginner</option>
+                                <option value="intermediate">Intermediate</option>
+                                <option value="advanced">Advanced</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button id="generateBtn" class="btn-generate" type="button">
+                        <span class="btn-generate__text">Generate Code</span>
+                        <span class="btn-generate__icon">→</span>
+                    </button>
+
+                    <!-- Warnings box -->
+                    <div id="warningsBox" class="warnings-box" hidden>
+                        <div class="warnings-title">⚠ Compatibility Warnings</div>
+                        <ul class="warnings-list" id="warningsList"></ul>
+                    </div>
+
+                    <!-- Examples -->
+                    <div class="examples-section" id="examples">
+                        <div class="examples-title">Quick Examples</div>
+                        <div class="example-list">
+                            <button class="example-chip"
+                                data-prompt="Blink an LED connected to pin 13 on Arduino Uno with 500ms intervals">LED
+                                Blink</button>
+                            <button class="example-chip"
+                                data-prompt="Read DHT22 temperature and humidity on ESP32 and display on OLED 128x64">DHT22
+                                + OLED</button>
+                            <button class="example-chip"
+                                data-prompt="Measure distance with HC-SR04 ultrasonic sensor on Arduino Uno and print to serial">Ultrasonic
+                                Distance</button>
+                            <button class="example-chip"
+                                data-prompt="Detect motion with PIR sensor, turn on relay when triggered, show status on LCD 16x2">PIR
+                                + Relay + LCD</button>
+                            <button class="example-chip"
+                                data-prompt="Read soil moisture sensor on ESP32 and control a water pump relay automatically when soil is dry">Smart
+                                Plant Watering</button>
+                            <button class="example-chip"
+                                data-prompt="MPU6050 accelerometer on Arduino Nano, detect tilt angle and control servo motor position">Tilt-Servo
+                                Control</button>
+                            <button class="example-chip"
+                                data-prompt="MQ2 gas sensor smoke alarm with buzzer and LED warning on Arduino Uno">Gas
+                                Alarm</button>
+                            <button class="example-chip"
+                                data-prompt="Bluetooth HC-05 on Arduino Uno to receive commands and control 2 DC motors with L298N">BT
+                                Motor Control</button>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- Right: Output panel -->
+                <section class="panel panel--output" id="outputPanel">
+
+                    <!-- Empty state -->
+                    <div class="empty-state" id="emptyState">
+                        <div class="empty-state__icon">{ }</div>
+                        <div class="empty-state__title">Ready to generate</div>
+                        <div class="empty-state__body">
+                            Describe your project on the left and click Generate.<br />
+                            Code, wiring diagram, and library list appear here.
+                        </div>
+                    </div>
+
+                    <!-- Loading state -->
+                    <div class="loading-state" id="loadingState" hidden>
+                        <div class="loading-spinner"></div>
+                        <div class="loading-text" id="loadingText">Analyzing your request...</div>
+                        <div class="loading-steps" id="loadingSteps"></div>
+                    </div>
+
+                    <!-- Result state -->
+                    <div class="result-state" id="resultState" hidden>
+
+                        <!-- Meta bar -->
+                        <div class="result-meta" id="resultMeta"></div>
+
+                        <!-- Tabs -->
+                        <div class="tabs" role="tablist">
+                            <button class="tab tab--active" role="tab" data-tab="code">Code</button>
+                            <button class="tab" role="tab" data-tab="wiring">Wiring</button>
+                            <button class="tab" role="tab" data-tab="libraries">Libraries</button>
+                            <button class="tab" role="tab" data-tab="notes">Notes</button>
+                        </div>
+
+                        <!-- Tab content -->
+                        <div class="tab-content" id="tabContent">
+
+                            <div class="tab-pane tab-pane--active" id="pane-code">
+                                <div class="code-toolbar">
+                                    <span class="code-lang">C++ / Arduino</span>
+                                    <button class="btn-copy" id="copyCodeBtn" data-target="codeOutput">
+                                        Copy Code
+                                    </button>
+                                </div>
+                                <pre class="code-block"><code class="language-cpp" id="codeOutput"></code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="pane-wiring">
+                                <div class="code-toolbar">
+                                    <span class="code-lang">Wiring Diagram</span>
+                                    <button class="btn-copy" id="copyWiringBtn" data-target="wiringOutput">Copy</button>
+                                </div>
+                                <pre class="code-block code-block--wiring"><code id="wiringOutput"></code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="pane-libraries">
+                                <div class="libraries-content" id="librariesOutput"></div>
+                            </div>
+
+                            <div class="tab-pane" id="pane-notes">
+                                <div class="notes-content" id="notesOutput"></div>
+                            </div>
+
+                        </div>
+
+                        <!-- Summary bar at bottom -->
+                        <div class="summary-bar" id="summaryBar"></div>
+
+                    </div>
+
+                    <!-- Error state -->
+                    <div class="error-state" id="errorState" hidden>
+                        <div class="error-icon">✕</div>
+                        <div class="error-title">Generation Failed</div>
+                        <div class="error-message" id="errorMessage"></div>
+                        <button class="btn-retry" id="retryBtn">Try Again</button>
+                    </div>
+
+                </section>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- ── Components reference ───────────────────────────────── -->
+    <section class="components-section" id="components">
+        <div class="container">
+            <h2 class="section-title">Supported Components</h2>
+            <p class="section-subtitle">All pinouts and specs are baked into the AI — no hallucinated wiring.</p>
+            <div class="components-grid" id="componentsGrid">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- ── Footer ─────────────────────────────────────────────── -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-inner">
+                <div class="footer-brand">
+                    <span class="logo-icon">⚡</span>
+                    <span>Arduino<strong>Forge</strong></span>
+                </div>
+                <div class="footer-links">
+                    <a href="https://github.com/yourusername/arduino-forge" target="_blank">GitHub</a>
+                    <a href="/api/health">API Status</a>
+                </div>
+                <div class="footer-note">
+                    Free forever · No login · No data stored · Open source
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="/js/app.js" type="module"></script>
+</body>
+
+</html>
