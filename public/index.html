@@ -1,370 +1,347 @@
 <!DOCTYPE html>
-<html lang="en" class="dark-theme">
+<html lang="en" data-theme="dark">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Arduino Forge | AI Code Generator</title>
-    <meta name="description"
-        content="Generate production-ready Arduino & ESP32 C++ code with accurate wiring diagrams, library lists, and safety checks." />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0d1117" />
+  <title>Arduino Forge | AI Code Generator</title>
+  <meta name="description" content="Generate production-ready Arduino & ESP32 C++ code with accurate wiring diagrams, library lists, and safety checks." />
 
-    <!-- Fonts: Inter for UI, JetBrains Mono for Code -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
-        rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
-    <!-- Highlight.js - GitHub Dark theme base -->
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" />
-    <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/editor/editor.main.min.css" />
+  <link rel="stylesheet" href="/css/main.css" />
 </head>
 
 <body>
+  <header class="site-header">
+    <div class="header-inner container">
+      <div class="brand">
+        <svg class="brand-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+        <span class="brand-text">Arduino<strong>Forge</strong></span>
+        <span class="badge">Beta</span>
+      </div>
+      <nav class="header-nav" id="mainNav">
+        <button class="theme-toggle" id="themeToggle" title="Toggle theme">
+          <svg class="icon-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          </svg>
+        </button>
 
-    <!-- ── Header ─────────────────────────────────────────────── -->
-    <header class="site-header">
-        <div class="header-inner container">
-            <div class="brand">
-                <svg class="brand-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                <span class="brand-text">Arduino<strong>Forge</strong></span>
-                <span class="badge">Beta</span>
-            </div>
-            <nav class="header-nav" id="mainNav">
-                <a href="#examples" class="nav-link">Examples</a>
-                <a href="#components" class="nav-link">Components</a>
-
-                <div class="auth-group" id="authNavGuest">
-                    <button class="btn btn-ghost btn-sm" id="btnOpenLogin">Sign In</button>
-                    <button class="btn btn-primary btn-sm" id="btnOpenRegister">Sign Up</button>
-                </div>
-                <div class="auth-group" id="authNavUser" hidden>
-                    <button class="btn btn-ghost btn-sm" id="btnMyProjects">My Projects <span id="projectsCount"
-                            class="badge">0</span></button>
-                    <button class="btn btn-ghost btn-sm" id="btnLogout">Logout</button>
-                </div>
-
-                <a href="https://github.com/SKar-2007/arduino-forge" class="btn btn-outline" target="_blank">
-                    <svg class="icon-sm" viewBox="0 0 24 24" fill="currentColor">
-                        <path
-                            d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
-                    </svg>
-                    GitHub
-                </a>
-            </nav>
+        <div class="auth-group" id="authNavGuest">
+          <button class="btn btn-ghost btn-sm" id="btnOpenLogin">Sign In</button>
+          <button class="btn btn-primary btn-sm" id="btnOpenRegister">Sign Up</button>
         </div>
-    </header>
-
-    <!-- ── Main App Layout ────────────────────────────────────── -->
-    <main class="app-layout container">
-
-        <!-- Left Panel: Input -->
-        <aside class="panel input-panel">
-            <div class="panel-header">
-                <h2 class="panel-title">System Request</h2>
-            </div>
-            <div class="panel-body">
-
-                <div class="form-group">
-                    <div class="form-header">
-                        <label for="prompt">Description</label>
-                        <span class="char-count" id="charCount">0 / 2000</span>
-                    </div>
-                    <textarea id="prompt" class="textarea" rows="6" maxlength="2000"
-                        placeholder="e.g. Read temperature and humidity with a DHT22 sensor on ESP32, display it on an OLED 128x64 screen, and send an alert if temperature exceeds 35°C. Use non-blocking delays."
-                        spellcheck="false"></textarea>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group half">
-                        <label for="boardSelect">Target Board</label>
-                        <select id="boardSelect" class="select">
-                            <option value="">Auto-detect</option>
-                            <option value="arduino-uno">Arduino Uno</option>
-                            <option value="arduino-nano">Arduino Nano</option>
-                            <option value="esp32">ESP32</option>
-                            <option value="esp8266">ESP8266</option>
-                        </select>
-                    </div>
-                    <div class="form-group half">
-                        <label for="difficultySelect">Code Level</label>
-                        <select id="difficultySelect" class="select">
-                            <option value="beginner">Beginner (Simple)</option>
-                            <option value="intermediate">Intermediate (Clean)</option>
-                            <option value="advanced">Advanced (Optimized)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <button id="generateBtn" class="btn btn-primary btn-block" type="button">
-                    Generate Code
-                </button>
-
-                <!-- Alerts -->
-                <div id="warningsBox" class="alert alert-warning" hidden>
-                    <div class="alert-header">
-                        <svg class="icon-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                        </svg>
-                        Hardware Warnings
-                    </div>
-                    <ul class="alert-list" id="warningsList"></ul>
-                </div>
-
-                <hr class="divider" />
-
-                <!-- Quick Presets -->
-                <div class="presets-section" id="examples">
-                    <div class="section-label">Quick Presets</div>
-                    <div class="preset-chips">
-                        <button class="chip"
-                            data-prompt="Blink an LED connected to pin 13 on Arduino Uno with 500ms intervals">LED
-                            Blink</button>
-                        <button class="chip"
-                            data-prompt="Read DHT22 temperature and humidity on ESP32 and display on OLED 128x64">DHT22
-                            + OLED</button>
-                        <button class="chip"
-                            data-prompt="Measure distance with HC-SR04 ultrasonic sensor on Arduino Uno and print to serial">Ultrasonic
-                            Target</button>
-                        <button class="chip"
-                            data-prompt="Detect motion with PIR sensor, turn on relay when triggered, show status on LCD 16x2">Motion
-                            Relay</button>
-                    </div>
-                </div>
-
-            </div>
-        </aside>
-
-        <!-- Right Panel: Output -->
-        <section class="panel output-panel" id="outputPanel">
-
-            <!-- Empty State -->
-            <div class="state-container" id="emptyState">
-                <svg class="state-icon muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                </svg>
-                <div class="state-title">No Code Generated</div>
-                <div class="state-desc">Describe your project on the left to synthesize C++ code, wiring, and library
-                    manifests.</div>
-            </div>
-
-            <!-- Loading State -->
-            <div class="state-container" id="loadingState" hidden>
-                <div class="spinner"></div>
-                <div class="state-title" id="loadingText">Analyzing architecture...</div>
-            </div>
-
-            <!-- Error State -->
-            <div class="state-container" id="errorState" hidden>
-                <svg class="state-icon text-red" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                    stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <div class="state-title">Generation Failed</div>
-                <div class="state-desc" id="errorMessage"></div>
-                <button class="btn btn-outline" id="retryBtn" style="margin-top: 16px;">Try Again</button>
-            </div>
-
-            <!-- Result State -->
-            <div class="result-container" id="resultState" hidden>
-
-                <header class="result-header">
-                    <div class="tabs" role="tablist">
-                        <button class="tab active" role="tab" data-tab="code">System.ino</button>
-                        <button class="tab" role="tab" data-tab="wiring">Wiring</button>
-                        <button class="tab" role="tab" data-tab="libraries">Deps</button>
-                        <button class="tab" role="tab" data-tab="notes">Docs</button>
-                    </div>
-
-                    <div class="result-actions">
-                        <button class="btn btn-sm btn-primary" id="compileActionBtn" title="Compile Code in Cloud">
-                            <svg class="icon-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                            </svg>
-                            Compile (.hex)
-                        </button>
-                        <button class="btn btn-sm btn-ghost" id="saveProjectBtn" style="display: none;"
-                            title="Save to Cloud">
-                            <svg class="icon-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                            </svg>
-                            Save Project
-                        </button>
-                        <!-- Download Zip feature placeholder -->
-                        <button class="btn btn-sm btn-outline" id="downloadZipBtn" title="Download ZIP">
-                            <svg class="icon-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                            </svg>
-                            Export .ZIP
-                        </button>
-                    </div>
-                </header>
-
-                <div class="meta-strip" id="resultMeta">
-                    <!-- Populated by JS -->
-                </div>
-
-                <div class="tab-content" id="tabContent">
-
-                    <!-- Code -->
-                    <div class="tab-pane active" id="pane-code">
-                        <div class="pane-toolbar">
-                            <span class="toolbar-label">C++ Editor</span>
-                            <button class="btn btn-sm btn-ghost" id="copyCodeBtn" data-target="codeOutput">Copy</button>
-                        </div>
-                        <div class="scroll-wrapper">
-                            <pre><code class="language-cpp" id="codeOutput"></code></pre>
-                        </div>
-                    </div>
-
-                    <!-- Wiring -->
-                    <div class="tab-pane" id="pane-wiring">
-                        <div class="pane-toolbar">
-                            <span class="toolbar-label">Hardware Schematic</span>
-                            <button class="btn btn-sm btn-ghost" id="copyWiringBtn"
-                                data-target="wiringOutput">Copy</button>
-                        </div>
-                        <div class="scroll-wrapper bg-terminal">
-                            <pre><code id="wiringOutput"></code></pre>
-                        </div>
-                    </div>
-
-                    <!-- Libraries -->
-                    <div class="tab-pane" id="pane-libraries">
-                        <div class="scroll-wrapper pad-md" id="librariesOutput"></div>
-                    </div>
-
-                    <!-- Notes -->
-                    <div class="tab-pane" id="pane-notes">
-                        <div class="scroll-wrapper pad-md text-prose" id="notesOutput"></div>
-                    </div>
-
-                </div>
-
-                <div class="result-footer" id="summaryBar"></div>
-            </div>
-        </section>
-    </main>
-
-    <!-- ── Footer ─────────────────────────────────────────────── -->
-    <footer class="site-footer">
-        <div class="container footer-inner">
-            <div class="footer-left">
-                <strong>ArduinoForge</strong>
-                <span class="muted mx-2">|</span>
-                <a href="/api/health" class="footer-link">API Status</a>
-                <span class="muted mx-2">|</span>
-                <button class="btn btn-ghost btn-sm" id="btnAdminStats" style="padding:0; margin:0;">Admin
-                    Metrics</button>
-            </div>
-            <div class="footer-right muted">
-                Open source tool for makers.
-            </div>
+        <div class="auth-group" id="authNavUser" hidden>
+          <button class="btn btn-ghost btn-sm" id="btnMyProjects">My Projects <span id="projectsCount" class="badge">0</span></button>
+          <button class="btn btn-ghost btn-sm" id="btnLogout">Logout</button>
         </div>
-    </footer>
 
-    <!-- ── Modals ─────────────────────────────────────────────── -->
-    <div class="modal-backdrop" id="authModal" hidden>
-        <div class="modal">
-            <div class="modal-header">
-                <h3 class="modal-title" id="authModalTitle">Sign In</h3>
-                <button class="btn-tool" id="btnCloseAuthModal">
-                    <svg class="icon-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div id="authError" class="alert alert-warning" hidden style="margin-top:0; margin-bottom: 16px;"></div>
-                <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" id="authUsername" class="textarea single-line"
-                        style="min-height: 38px; font-family:var(--font-sans);" />
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" id="authPassword" class="textarea single-line"
-                        style="min-height: 38px; font-family:var(--font-sans);" />
-                </div>
-                <button class="btn btn-primary btn-block" id="btnSubmitAuth">Continue</button>
-            </div>
-        </div>
+        <a href="https://github.com/SKar-2007/arduino-forge" class="btn btn-outline" target="_blank">
+          <svg class="icon-sm" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+          </svg>
+          <span>GitHub</span>
+        </a>
+      </nav>
     </div>
+  </header>
 
-    <div class="modal-backdrop" id="projectsModal" hidden>
-        <div class="modal modal-lg">
-            <div class="modal-header">
-                <h3 class="modal-title">My Projects</h3>
-                <button class="btn-tool" id="btnCloseProjectsModal">
-                    <svg class="icon-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-            <div class="modal-body custom-scrollbar" style="max-height: 60vh; overflow-y:auto;" id="projectsList">
-                <div class="muted">Loading projects...</div>
-            </div>
+  <main class="app-layout container">
+    <aside class="panel input-panel">
+      <div class="panel-header">
+        <h2 class="panel-title">System Request</h2>
+      </div>
+      <div class="panel-body">
+        <div class="form-group">
+          <div class="form-header">
+            <label for="prompt">Description</label>
+            <span class="char-count" id="charCount">0 / 2000</span>
+          </div>
+          <textarea id="prompt" class="textarea" rows="6" maxlength="2000"
+            placeholder="e.g. Read temperature and humidity with a DHT22 sensor on ESP32, display it on an OLED 128x64 screen, and send an alert if temperature exceeds 35°C."
+            spellcheck="false"></textarea>
         </div>
-    </div>
 
-    <div class="modal-backdrop" id="adminModal" hidden>
-        <div class="modal modal-lg">
-            <div class="modal-header">
-                <h3 class="modal-title">System Metrics</h3>
-                <button class="btn-tool" id="btnCloseAdminModal">
-                    <svg class="icon-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div style="display: flex; gap: var(--space-4); margin-bottom: var(--space-4);">
-                    <div
-                        style="flex:1; padding: var(--space-3); background: var(--bg-inset); border-radius: var(--radius-sm); text-align: center;">
-                        <div class="muted">Total Users</div>
-                        <div style="font-size: 24px; font-weight: bold; color: var(--accent-blue);" id="statUsers">-
-                        </div>
-                    </div>
-                    <div
-                        style="flex:1; padding: var(--space-3); background: var(--bg-inset); border-radius: var(--radius-sm); text-align: center;">
-                        <div class="muted">Projects Saved</div>
-                        <div style="font-size: 24px; font-weight: bold; color: var(--accent-green);" id="statProjects">-
-                        </div>
-                    </div>
-                    <div
-                        style="flex:1; padding: var(--space-3); background: var(--bg-inset); border-radius: var(--radius-sm); text-align: center;">
-                        <div class="muted">Generations</div>
-                        <div style="font-size: 24px; font-weight: bold; color: var(--accent-yellow);"
-                            id="statGenerations">-</div>
-                    </div>
-                </div>
-                <h4 style="margin-bottom: var(--space-3);">Recent API Activity</h4>
-                <div class="custom-scrollbar" style="max-height: 30vh; overflow-y:auto;">
-                    <table
-                        style="width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 12px; text-align: left;">
-                        <thead>
-                            <tr style="border-bottom: 1px solid var(--border-muted);">
-                                <th style="padding: 8px;">Endpoint</th>
-                                <th style="padding: 8px;">Status</th>
-                                <th style="padding: 8px;">Time</th>
-                            </tr>
-                        </thead>
-                        <tbody id="adminActivityList"></tbody>
-                    </table>
-                </div>
-            </div>
+        <div class="form-row">
+          <div class="form-group half">
+            <label for="boardSelect">Target Board</label>
+            <select id="boardSelect" class="select">
+              <option value="">Auto-detect</option>
+              <option value="arduino-uno">Arduino Uno</option>
+              <option value="arduino-nano">Arduino Nano</option>
+              <option value="arduino-mega">Arduino Mega</option>
+              <option value="arduino-due">Arduino Due</option>
+              <option value="esp32">ESP32</option>
+              <option value="esp8266">ESP8266</option>
+              <option value="rp2040">Raspberry Pi Pico</option>
+            </select>
+          </div>
+          <div class="form-group half">
+            <label for="difficultySelect">Code Level</label>
+            <select id="difficultySelect" class="select">
+              <option value="beginner">Beginner (Simple)</option>
+              <option value="intermediate">Intermediate (Clean)</option>
+              <option value="advanced">Advanced (Optimized)</option>
+            </select>
+          </div>
         </div>
-    </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <script src="/js/app.js" type="module"></script>
+        <button id="generateBtn" class="btn btn-primary btn-block" type="button">
+          Generate Code
+        </button>
+        <div class="keyboard-shortcuts-hint"><kbd>Ctrl</kbd>+<kbd>Enter</kbd> to generate · <kbd>Ctrl</kbd>+<kbd>K</kbd> to focus</div>
+
+        <div id="warningsBox" class="alert alert-warning" hidden>
+          <div class="alert-header">
+            <svg class="icon-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            Hardware Warnings
+          </div>
+          <ul class="alert-list" id="warningsList"></ul>
+        </div>
+
+        <hr class="divider" />
+
+        <div class="presets-section" id="examples">
+          <div class="section-label">Quick Presets</div>
+          <div class="preset-chips">
+            <button class="chip" data-prompt="Blink an LED connected to pin 13 on Arduino Uno with 500ms intervals">LED Blink</button>
+            <button class="chip" data-prompt="Read DHT22 temperature and humidity on ESP32 and display on OLED 128x64">DHT22 + OLED</button>
+            <button class="chip" data-prompt="Measure distance with HC-SR04 ultrasonic sensor on Arduino Uno and print to serial">Ultrasonic</button>
+            <button class="chip" data-prompt="Detect motion with PIR sensor, turn on relay when triggered, show status on LCD 16x2">Motion Relay</button>
+          </div>
+        </div>
+
+        <hr class="divider" />
+
+        <div class="presets-section" id="componentBrowser">
+          <div class="section-label">Component Browser</div>
+          <div class="comp-list" id="componentList"></div>
+        </div>
+      </div>
+    </aside>
+
+    <section class="panel output-panel" id="outputPanel">
+      <div class="state-container" id="emptyState">
+        <svg class="state-icon muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+        </svg>
+        <div class="state-title">No Code Generated</div>
+        <div class="state-desc">Describe your project on the left to synthesize C++ code, wiring, and library manifests.</div>
+      </div>
+
+      <div class="state-container" id="loadingState" hidden>
+        <div class="spinner"></div>
+        <div class="state-title" id="loadingText">Analyzing architecture...</div>
+      </div>
+
+      <div class="state-container" id="errorState" hidden>
+        <svg class="state-icon text-red" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <div class="state-title">Generation Failed</div>
+        <div class="state-desc" id="errorMessage"></div>
+        <button class="btn btn-outline" id="retryBtn" style="margin-top: 16px;">Try Again</button>
+      </div>
+
+      <div class="result-container" id="resultState" hidden>
+        <header class="result-header">
+          <div class="tabs" role="tablist">
+            <button class="tab active" role="tab" data-tab="code">System.ino</button>
+            <button class="tab" role="tab" data-tab="wiring">Wiring</button>
+            <button class="tab" role="tab" data-tab="libraries">Deps</button>
+            <button class="tab" role="tab" data-tab="notes">Docs</button>
+          </div>
+          <div class="result-actions">
+            <button class="btn btn-sm btn-outline" id="wokwiBtn" title="Simulate in Wokwi">
+              <svg class="icon-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Simulate
+            </button>
+            <button class="btn btn-sm btn-primary" id="compileActionBtn" title="Compile Code in Cloud">
+              <svg class="icon-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Compile
+            </button>
+            <button class="btn btn-sm btn-ghost" id="saveProjectBtn" style="display:none;" title="Save to Cloud">
+              <svg class="icon-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+              </svg>
+              Save
+            </button>
+            <button class="btn btn-sm btn-outline" id="downloadZipBtn" title="Download ZIP">
+              <svg class="icon-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              .ZIP
+            </button>
+          </div>
+        </header>
+
+        <div class="meta-strip" id="resultMeta"></div>
+
+        <div class="tab-content" id="tabContent">
+          <div class="tab-pane active" id="pane-code">
+            <div class="pane-toolbar">
+              <span class="toolbar-label">C++ Editor</span>
+              <button class="btn btn-sm btn-ghost" id="copyCodeBtn">Copy</button>
+            </div>
+            <div class="scroll-wrapper" style="padding:0;">
+              <div id="codeEditorContainer"></div>
+              <pre style="display:none;"><code class="language-cpp" id="codeOutput"></code></pre>
+            </div>
+          </div>
+
+          <div class="tab-pane" id="pane-wiring">
+            <div class="pane-toolbar">
+              <span class="toolbar-label">Hardware Schematic</span>
+              <button class="btn btn-sm btn-ghost" id="copyWiringBtn">Copy</button>
+            </div>
+            <div class="scroll-wrapper bg-terminal" id="wiringOutput"></div>
+          </div>
+
+          <div class="tab-pane" id="pane-libraries">
+            <div class="scroll-wrapper pad-md" id="librariesOutput"></div>
+          </div>
+
+          <div class="tab-pane" id="pane-notes">
+            <div class="scroll-wrapper pad-md text-prose" id="notesOutput"></div>
+          </div>
+        </div>
+
+        <div class="result-footer" id="summaryBar"></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="refineSection" class="container" style="padding-bottom: var(--space-4);" hidden>
+    <div class="panel" style="border-color: var(--border-muted);">
+      <div class="panel-header">
+        <h3 class="panel-title">Refine Generated Code</h3>
+      </div>
+      <div class="panel-body">
+        <div class="form-group">
+          <textarea id="refineInput" class="textarea" rows="2" placeholder="e.g. Change the LED pin to 9, add MQTT WiFi upload, or fix the timing..." style="min-height:50px;"></textarea>
+        </div>
+        <button id="refineBtn" class="btn btn-primary">Refine Code</button>
+        <span class="muted" style="font-size:11px; margin-left:8px;"><kbd>Ctrl</kbd>+<kbd>Enter</kbd></span>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-left">
+        <strong>ArduinoForge</strong>
+        <span class="muted mx-2">|</span>
+        <a href="/api/health" class="footer-link">API Status</a>
+        <span class="muted mx-2">|</span>
+        <button class="btn btn-ghost btn-sm" id="btnAdminStats" style="padding:0; margin:0;">Admin Metrics</button>
+      </div>
+      <div class="footer-right muted">
+        Open source tool for makers. <kbd>Ctrl</kbd>+<kbd>S</kbd> to save
+      </div>
+    </div>
+  </footer>
+
+  <div id="toastContainer" class="toast-container"></div>
+
+  <div class="modal-backdrop" id="authModal" hidden>
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="authModalTitle">Sign In</h3>
+        <button class="btn-tool" id="btnCloseAuthModal">
+          <svg class="icon-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="authError" class="alert alert-warning" hidden style="margin-top:0; margin-bottom:16px;"></div>
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="authUsername" class="textarea single-line" style="min-height:38px; font-family:var(--font-sans);" />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="authPassword" class="textarea single-line" style="min-height:38px; font-family:var(--font-sans);" />
+        </div>
+        <button class="btn btn-primary btn-block" id="btnSubmitAuth">Continue</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="projectsModal" hidden>
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <h3 class="modal-title">My Projects</h3>
+        <button class="btn-tool" id="btnCloseProjectsModal">
+          <svg class="icon-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body custom-scrollbar" style="max-height:60vh; overflow-y:auto;" id="projectsList">
+        <div class="muted">Loading projects...</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="adminModal" hidden>
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <h3 class="modal-title">System Metrics</h3>
+        <button class="btn-tool" id="btnCloseAdminModal">
+          <svg class="icon-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div style="display:flex; gap:var(--space-4); margin-bottom:var(--space-4);">
+          <div style="flex:1; padding:var(--space-3); background:var(--bg-inset); border-radius:var(--radius-sm); text-align:center;">
+            <div class="muted">Total Users</div>
+            <div style="font-size:24px; font-weight:bold; color:var(--accent-blue);" id="statUsers">-</div>
+          </div>
+          <div style="flex:1; padding:var(--space-3); background:var(--bg-inset); border-radius:var(--radius-sm); text-align:center;">
+            <div class="muted">Projects Saved</div>
+            <div style="font-size:24px; font-weight:bold; color:var(--accent-green);" id="statProjects">-</div>
+          </div>
+          <div style="flex:1; padding:var(--space-3); background:var(--bg-inset); border-radius:var(--radius-sm); text-align:center;">
+            <div class="muted">Generations</div>
+            <div style="font-size:24px; font-weight:bold; color:var(--accent-yellow);" id="statGenerations">-</div>
+          </div>
+        </div>
+        <h4 style="margin-bottom:var(--space-3);">Recent API Activity</h4>
+        <div class="custom-scrollbar" style="max-height:30vh; overflow-y:auto;">
+          <table style="width:100%; border-collapse:collapse; font-family:var(--font-mono); font-size:12px; text-align:left;">
+            <thead>
+              <tr style="border-bottom:1px solid var(--border-muted);">
+                <th style="padding:8px;">Endpoint</th>
+                <th style="padding:8px;">Status</th>
+                <th style="padding:8px;">Duration</th>
+              </tr>
+            </thead>
+            <tbody id="adminActivityList"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
+  <script type="module" src="/js/app.js"></script>
 </body>
-
 </html>

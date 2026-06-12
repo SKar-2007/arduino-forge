@@ -1,0 +1,12 @@
+services:
+  forge:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./forge.db:/app/forge.db
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - JWT_SECRET=${JWT_SECRET}
+      - NODE_ENV=production
+    restart: unless-stopped

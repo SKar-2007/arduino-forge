@@ -22,13 +22,17 @@ Desktop.ini
 *.swp
 *.swo
 *~
+*.sublime-*
 
 # ── Build / temp ─────────────────────────────────────────────────
 dist/
 tmp/
+temp/
 .cache/
 
-# Database
-*.db
+# ── Database ─────────────────────────────────────────────────────
+forge.db
+forge.db-shm
+forge.db-wal
 *.sqlite
 *.sqlite3

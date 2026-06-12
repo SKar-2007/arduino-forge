@@ -1,0 +1,41 @@
+CREATE TABLE IF NOT EXISTS users (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  username TEXT UNIQUE NOT NULL,
+  password_hash TEXT NOT NULL,
+  role TEXT DEFAULT 'user',
+  email TEXT,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS projects (
+  id TEXT PRIMARY KEY,
+  user_id INTEGER NOT NULL,
+  name TEXT NOT NULL,
+  prompt TEXT,
+  board TEXT,
+  code TEXT NOT NULL,
+  wiring TEXT,
+  libraries TEXT,
+  notes TEXT,
+  tags TEXT,
+  is_public INTEGER DEFAULT 0,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS metrics (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  endpoint TEXT NOT NULL,
+  method TEXT,
+  user_id INTEGER,
+  duration_ms INTEGER,
+  status_code INTEGER,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS prompt_cache (
+  key TEXT PRIMARY KEY,
+  response TEXT,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
