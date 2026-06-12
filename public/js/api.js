@@ -16,12 +16,12 @@ const API = {
     return res.json();
   },
 
-  async auth(endpoint, username, password) {
+  async auth(endpoint, body) {
     const res = await fetch(`/api/auth/${endpoint}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "same-origin",
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify(body),
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || "Auth failed");

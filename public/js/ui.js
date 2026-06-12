@@ -44,11 +44,17 @@ export const els = {
   projectsCount: $("projectsCount"),
 
   authModal: $("authModal"),
-  authModalTitle: $("authModalTitle"),
   btnCloseAuthModal: $("btnCloseAuthModal"),
   authUsername: $("authUsername"),
   authPassword: $("authPassword"),
+  authRegUsername: $("authRegUsername"),
+  authEmail: $("authEmail"),
+  authRegPassword: $("authRegPassword"),
+  authConfirm: $("authConfirm"),
+  authRegHint: $("authRegHint"),
   btnSubmitAuth: $("btnSubmitAuth"),
+  btnSubmitReg: $("btnSubmitReg"),
+  btnGoogleAuth: $("btnGoogleAuth"),
   authError: $("authError"),
 
   projectsModal: $("projectsModal"),
@@ -238,6 +244,7 @@ export function initThemeToggle() {
       const next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
       document.documentElement.setAttribute("data-theme", next);
       localStorage.setItem("forge_theme", next);
+      import("./editor.js").then(m => m.syncEditorTheme());
     });
   }
 }

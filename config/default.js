@@ -9,6 +9,8 @@ export const config = Object.freeze({
 
   jwtSecret: process.env.JWT_SECRET || required("JWT_SECRET"),
 
+  googleClientId: process.env.GOOGLE_CLIENT_ID || "",
+
   gemini: Object.freeze({
     apiKey: process.env.GEMINI_API_KEY || "",
     model: process.env.GEMINI_MODEL || "gemini-1.5-flash",

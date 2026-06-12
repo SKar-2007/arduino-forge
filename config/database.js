@@ -64,6 +64,11 @@ const migrations = [
   "CREATE INDEX IF NOT EXISTS idx_projects_public ON projects(is_public)",
 ];
 
+try { db.exec("ALTER TABLE metrics ADD COLUMN method TEXT"); } catch { }
+try { db.exec("ALTER TABLE metrics ADD COLUMN user_id INTEGER"); } catch { }
+try { db.exec("ALTER TABLE users ADD COLUMN email TEXT"); } catch { }
+try { db.exec("ALTER TABLE users ADD COLUMN google_id TEXT UNIQUE"); } catch { }
+
 for (const sql of migrations) {
   try { db.exec(sql); } catch { }
 }

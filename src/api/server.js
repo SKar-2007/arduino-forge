@@ -47,10 +47,12 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "cdnjs.cloudflare.com"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "cdnjs.cloudflare.com", "accounts.google.com"],
       styleSrc: ["'self'", "'unsafe-inline'", "fonts.googleapis.com", "cdnjs.cloudflare.com"],
       fontSrc: ["'self'", "fonts.gstatic.com"],
       connectSrc: ["'self'"],
+      imgSrc: ["'self'", "https://*.googleusercontent.com"],
+      frameSrc: ["'self'", "https://accounts.google.com"],
     },
   },
 }));
@@ -206,6 +208,12 @@ app.get("/api/components", (req, res) => {
     communication: getByCategory("communication"),
   };
   res.json({ success: true, data: grouped });
+});
+
+app.get("/api/config", (req, res) => {
+  res.json({
+    googleClientId: config.googleClientId || null,
+  });
 });
 
 app.get("/api/health", (req, res) => {
